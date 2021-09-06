@@ -3,9 +3,19 @@ ID: adi-project-mta
 description: A simple CAP project.
 version: 1.0.0
 modules:
+- name: adi-project-mta-db-deployer
+  type: hdb
+  path: db
+  requires:
+  - name: adi-project-mta-db
+  parameters:
+    buildpack: nodejs_buildpack
 - name: adi-project-mta-srv
   type: nodejs
-  path: gen/srv
+  path: srv
+  requires:
+  - name: adi-project-mta-db
+  - name: uaa_adi-project-mta
   provides:
   - name: srv-api
     properties:
@@ -42,12 +52,66 @@ modules:
         existing_destinations_policy: ignore
   build-parameters:
     no-source: true
+- name: adi-project-mta-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: adi-project-mta_html_repo_host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - adiwebmarket.zip
+      name: adiwebmarket
+      target-path: resources/
+    - artifacts:
+      - adiadminapp.zip
+      name: adiadminapp
+      target-path: resources/
+- name: adiwebmarket
+  type: html5
+  path: app/web-market
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: adiadminapp
+  type: html5
+  path: app/admin-app
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
 resources:
+- name: adi-project-mta-db
+  type: com.sap.xs.hdi-container
+  parameters:
+    service: hana
+    service-plan: hdi-shared
+  properties:
+    hdi-service-name: ${service-name}
 - name: adi-project-mta-destination-service
   type: org.cloudfoundry.managed-service
   parameters:
     config:
       HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
       version: 1.0.0
     service: destination
     service-name: adi-project-mta-destination-service
@@ -66,6 +130,7 @@ resources:
     service-name: adi-project-mta-xsuaa-service
     service-plan: application
 parameters:
+  deploy_mode: html5-repo
   enable-parallel-deployments: true
 build-parameters:
   before-all:
