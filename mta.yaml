@@ -15,7 +15,9 @@ modules:
   path: srv
   requires:
   - name: adi-project-mta-db
-  - name: uaa_adi-project-mta
+  - name: adi-project-mta-uaa
+  - name: adi-project-mta-conn
+  - name: adi-project-mta-dest
   provides:
   - name: srv-api
     properties:
@@ -25,17 +27,17 @@ modules:
 - name: adi-project-mta-destination-content
   type: com.sap.application.content
   requires:
-  - name: adi-project-mta-destination-service
+  - name: adi-project-mta-dest
     parameters:
       content-target: true
   - name: adi-project-mta_html_repo_host
     parameters:
       service-key:
         name: adi-project-mta_html_repo_host-key
-  - name: uaa_adi-project-mta
+  - name: adi-project-mta-uaa
     parameters:
       service-key:
-        name: uaa_adi-project-mta-key
+        name: adi-project-mta-uaa-key
   parameters:
     content:
       instance:
@@ -47,14 +49,14 @@ modules:
         - Authentication: OAuth2UserTokenExchange
           Name: adi_uaa_adi_project_mta
           ServiceInstanceName: adi-project-mta-xsuaa-service
-          ServiceKeyName: uaa_adi-project-mta-key
+          ServiceKeyName: adi-project-mta-uaa-key
           sap.cloud.service: adi
         existing_destinations_policy: ignore
   build-parameters:
     no-source: true
 - name: adi-project-mta-app-content
   type: com.sap.application.content
-  path: .
+  path: app
   requires:
   - name: adi-project-mta_html_repo_host
     parameters:
@@ -98,23 +100,19 @@ resources:
     service-plan: hdi-shared
   properties:
     hdi-service-name: ${service-name}
-- name: adi-project-mta-destination-service
+- name: adi-project-mta-dest
   type: org.cloudfoundry.managed-service
   parameters:
     config:
       HTML5Runtime_enabled: true
-      init_data:
-        instance:
-          destinations:
-          - Authentication: NoAuthentication
-            Name: ui5
-            ProxyType: Internet
-            Type: HTTP
-            URL: https://ui5.sap.com
-          existing_destinations_policy: update
       version: 1.0.0
     service: destination
-    service-name: adi-project-mta-destination-service
+    service-name: adi-project-mta-dest
+    service-plan: lite
+- name: adi-project-mta-conn
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: connectivity
     service-plan: lite
 - name: adi-project-mta_html_repo_host
   type: org.cloudfoundry.managed-service
@@ -122,7 +120,7 @@ resources:
     service: html5-apps-repo
     service-name: adi-project-mta-html5-app-host-service
     service-plan: app-host
-- name: uaa_adi-project-mta
+- name: adi-project-mta-uaa
   type: org.cloudfoundry.managed-service
   parameters:
     path: ./xs-security.json

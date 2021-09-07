@@ -10,7 +10,22 @@
         "title": "{{appTitle}}",
         "description": "{{appDescription}}",
         "resources": "resources.json",
-        "ach": "ach"
+        "ach": "ach",
+        "crossNavigation": {
+            "inbounds": {
+                "adi-adminapp-inbound": {
+                    "signature": {
+                        "parameters": {},
+                        "additionalParameters": "allowed"
+                    },
+                    "semanticObject": "admin",
+                    "action": "display",
+                    "title": "{{flpTitle}}",
+                    "subTitle": "{{flpSubtitle}}",
+                    "icon": ""
+                }
+            }
+        }
     },
     "sap.ui": {
         "technology": "UI5",
