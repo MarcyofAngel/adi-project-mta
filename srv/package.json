@@ -1,0 +1,44 @@
+{
+    "name": "adi-project-mta-srv",
+    "description": "Generated from ../package.json, do not change!",
+    "version": "1.0.0",
+    "dependencies": {
+        "@ladjs/i18n": "^7.2.3",
+        "@sap/audit-logging": "^5.1.0",
+        "@sap/cds": "^5.4.3",
+        "@sap/cds-dk": "^4.4.2",
+        "@sap/cds-odata-v2-adapter-proxy": "^1.7.10",
+        "@sap/hana-client": "^2.9.28",
+        "@sap/xssec": "^3.2.4",
+        "atob": "^2.1.2",
+        "axios": "^0.21.4",
+        "cfenv": "^1.2.4",
+        "express": "^4.17.1",
+        "i18n": "^0.13.2",
+        "passport": "^0.4.1"
+    },
+    "devDependencies": {
+        "@sap/cds-foss": "^2.3.0"
+    },
+    "scripts": {
+        "postinstall": "npm dedupe && node .build.js",
+        "start": "node ./node_modules/@sap/cds/bin/cds.js serve gen/csn.json",
+        "watch": "nodemon -w . -i node_modules/**,.git/** -e cds -x npm run build"
+    },
+    "private": true,
+    "cds": {
+        "hana": {
+            "deploy-format": "hdbtable",
+            "syntax": "hdi"
+        },
+        "requires": {
+            "db": {
+                "kind": "hana",
+                "model": "gen/csn.json"
+            },
+            "uaa": {
+                "kind": "xsuaa"
+            }
+        }
+    }
+}

@@ -56,7 +56,7 @@ modules:
     no-source: true
 - name: adi-project-mta-app-content
   type: com.sap.application.content
-  path: app
+  path: .
   requires:
   - name: adi-project-mta_html_repo_host
     parameters:
